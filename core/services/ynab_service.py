@@ -1,7 +1,7 @@
-"""YNAB API service for managing payees."""
+"""YNAB API service for managing budgets, accounts, and transactions."""
 from dataclasses import dataclass
 import requests
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 
 @dataclass
 class Payee:
@@ -58,3 +58,6 @@ class YNABService:
         except requests.exceptions.RequestException as e:
             print(f"Error updating payee in YNAB: {e}")
             return False
+    
+    # Additional methods can be added here as needed for other YNAB API endpoints
+    # For example: get_transactions, get_accounts, create_transaction, etc.
