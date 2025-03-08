@@ -19,6 +19,8 @@ class Transaction:
 class YNABService:
     """Service for interacting with YNAB API."""
     
+    DELETED_PAYEE_NAME = "Deleted"
+    
     def __init__(self, api_key: str, budget_id: str):
         self.api_key = api_key
         self.budget_id = budget_id
@@ -84,17 +86,9 @@ class YNABService:
         except requests.exceptions.RequestException as e:
             raise RuntimeError(f"Error fetching transactions from YNAB: {e}") from e
 
-    def delete_payee(self, payee_id: str) -> bool:
-        """Delete a payee from YNAB."""
-        url = f"{self.base_url}/budgets/{self.budget_id}/payees/{payee_id}"
-        
-        try:
-            response = requests.delete(url, headers=self.headers)
-            response.raise_for_status()
-            return True
-        except requests.exceptions.RequestException as e:
-            print(f"Error deleting payee in YNAB: {e}")
-            return False
+    def mark_payee_as_deleted(self, payee_id: str) -> bool:
+        """Mark a payee as deleted by renaming it."""
+        return self.update_payee_name(payee_id, self.DELETED_PAYEE_NAME)
     
     # Additional methods can be added here as needed for other YNAB API endpoints
     # For example: get_transactions, get_accounts, create_transaction, etc.

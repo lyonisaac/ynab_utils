@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 YNAB Payee Cleanup - Main entry point
-Filters and deletes payees without associated transactions from YNAB
+Marks unused payees as deleted by renaming them to a common name
 """
 import os
 import sys
@@ -42,37 +42,38 @@ class PayeeCleanup:
         used_payee_ids = {t.payee_id for t in transactions if t.payee_id}
         
         # Filter payees that aren't in the used set and aren't deleted
-        # Also exclude payees that start with "Transfer"
+        # Also exclude payees that start with "Transfer" or are already named "Deleted"
         unused_payees = [
             p for p in all_payees 
             if p.id not in used_payee_ids 
             and not p.deleted 
             and p.name.strip()
             and not p.name.strip().startswith("Transfer")
+            and p.name != self.ynab_service.DELETED_PAYEE_NAME
         ]
         
         return unused_payees
     
     def delete_payee(self, payee: Payee, dry_run: bool = False) -> bool:
         """
-        Delete a payee from YNAB.
+        Mark a payee as deleted by renaming it.
         
         Args:
-            payee: Payee object to delete
-            dry_run: If True, don't actually delete, just simulate
+            payee: Payee object to mark as deleted
+            dry_run: If True, don't actually modify, just simulate
             
         Returns:
-            bool: True if deleted successfully, False otherwise
+            bool: True if marked as deleted successfully, False otherwise
         """
         if dry_run:
-            print(f"Would delete payee: {payee.name}")
+            print(f"Would mark as deleted: {payee.name}")
             return True
             
-        success = self.ynab_service.delete_payee(payee.id)
+        success = self.ynab_service.mark_payee_as_deleted(payee.id)
         if success:
-            print(f"✅ Deleted payee: {payee.name}")
+            print(f"✅ Marked as deleted: {payee.name}")
         else:
-            print(f"❌ Failed to delete payee: {payee.name}")
+            print(f"❌ Failed to mark as deleted: {payee.name}")
         return success
     
     def cleanup_payees(self, dry_run: bool = False, interactive: bool = False) -> Dict:
