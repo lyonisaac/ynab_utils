@@ -5,6 +5,7 @@ Adds appropriate emojis to YNAB payees using LLM services
 """
 import os
 import sys
+from dotenv import load_dotenv
 
 # Add parent directory to path so we can import core
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -15,12 +16,16 @@ from src.app import EmojiNamer
 def main():
     """Main entry point."""
     try:
-        # Load base configuration
-        config = load_config(project_name="ynab_namer")
+        # Explicitly load the .env file from the current directory
+        env_path = os.path.join(os.path.dirname(__file__), '.env')
+        load_dotenv(env_path)
+        
+        # Load base configuration without project prefix
+        config = load_config()
         
         # Load LLM configuration
         llm_config = {
-            "provider": os.getenv("YNAB_NAMER_LLM_PROVIDER", "groq"),
+            "provider": os.getenv("LLM_PROVIDER", "groq"),
             "api_key": os.getenv("GROQ_API_KEY", ""),
             "model": os.getenv("GROQ_MODEL", "llama3-70b-8192")
         }
