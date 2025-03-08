@@ -10,7 +10,6 @@ import sys
 from datetime import datetime
 from dotenv import load_dotenv
 import requests
-import groq
 
 # Load environment variables
 load_dotenv()
@@ -26,6 +25,8 @@ IGNORED_PAYEES_FILE = "ignored_payees.json"
 
 # YNAB API base URL
 YNAB_API_BASE = "https://api.youneedabudget.com/v1"
+# Groq API base URL
+GROQ_API_BASE = "https://api.groq.com/openai/v1"
 
 
 def check_config():
@@ -115,34 +116,43 @@ def save_ignored_payee(payee):
 
 def get_emoji_for_payee(payee_name):
     """Use Groq API to get an appropriate emoji for the payee"""
-    client = groq.Client(api_key=GROQ_API_KEY)
+    # Updated to use the correct Groq API format according to documentation
+    headers = {
+        "Authorization": f"Bearer {GROQ_API_KEY}",
+        "Content-Type": "application/json"
+    }
+    
+    url = f"{GROQ_API_BASE}/chat/completions"
     
     prompt = f"""Please suggest a single emoji that best represents the following business/payee name:
 "{payee_name}"
 
 Return ONLY the emoji character and nothing else. Choose an emoji that intuitively represents the type of business or service."""
 
+    data = {
+        "model": GROQ_MODEL,
+        "messages": [
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ],
+        "temperature": 0.5,
+        "max_tokens": 10,
+        "top_p": 1
+    }
+    
     try:
-        chat_completion = client.chat.completions.create(
-            messages=[
-                {
-                    "role": "user",
-                    "content": prompt,
-                }
-            ],
-            model=GROQ_MODEL,
-            temperature=0.5,
-            max_tokens=10,
-            top_p=1,
-            stream=False,
-        )
-        
-        # Extract just the emoji from the response
-        emoji = chat_completion.choices[0].message.content.strip()
+        response = requests.post(url, headers=headers, json=data)
+        response.raise_for_status()
+        result = response.json()
+        emoji = result['choices'][0]['message']['content'].strip()
         return emoji
     
     except Exception as e:
         print(f"Error getting emoji from Groq API: {e}")
+        if response := getattr(e, 'response', None):
+            print(f"Response: {response.text}")
         return None
 
 
