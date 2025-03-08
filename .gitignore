@@ -1,2 +1,8 @@
 .env
 ignored_payees.json
+src/__pycache__/__init__.cpython-312.pyc
+src/__pycache__/config.cpython-312.pyc
+src/__pycache__/ignored_payees.cpython-312.pyc
+src/__pycache__/groq_service.cpython-312.pyc
+src/__pycache__/app.cpython-312.pyc
+src/__pycache__/ynab_service.cpython-312.pyc
