@@ -42,11 +42,13 @@ class PayeeCleanup:
         used_payee_ids = {t.payee_id for t in transactions if t.payee_id}
         
         # Filter payees that aren't in the used set and aren't deleted
+        # Also exclude payees that start with "Transfer"
         unused_payees = [
             p for p in all_payees 
             if p.id not in used_payee_ids 
             and not p.deleted 
             and p.name.strip()
+            and not p.name.strip().startswith("Transfer")
         ]
         
         return unused_payees
