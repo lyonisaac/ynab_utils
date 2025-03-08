@@ -210,14 +210,22 @@ def main():
         print("No payees need emoji updates. Exiting.")
         return
     
+    # Track payees processed in this session to avoid duplicates
+    processed_ids = set()
+    
     # Process each payee
     for payee in payees_to_process:
+        # Skip if we've already processed this payee in the current session
+        if payee['id'] in processed_ids:
+            continue
+            
         print("\n" + "-" * 40)
         print(f"Processing: {payee['name']}")
         
         emoji = get_emoji_for_payee(payee['name'])
         if not emoji:
             print(f"Couldn't get emoji for {payee['name']}, skipping.")
+            processed_ids.add(payee['id'])  # Mark as processed even if skipped due to API error
             continue
             
         suggested_name = f"{payee['name']} {emoji}"
@@ -229,9 +237,10 @@ def main():
             update_payee_name(payee['id'], suggested_name)
         elif choice == 'i':
             save_ignored_payee(payee)
-        else:
-            print("Skipped.")
-
+        
+        # Mark this payee as processed regardless of choice
+        processed_ids.add(payee['id'])
+        
     print("\n🎉 All done! Thank you for using YNAB Emoji Namer")
 
 
