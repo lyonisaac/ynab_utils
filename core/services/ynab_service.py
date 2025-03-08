@@ -10,6 +10,12 @@ class Payee:
     name: str
     deleted: bool
 
+@dataclass
+class Transaction:
+    """YNAB transaction data."""
+    id: str
+    payee_id: Optional[str]
+
 class YNABService:
     """Service for interacting with YNAB API."""
     
@@ -57,6 +63,37 @@ class YNABService:
             return True
         except requests.exceptions.RequestException as e:
             print(f"Error updating payee in YNAB: {e}")
+            return False
+    
+    def get_transactions(self) -> List[Transaction]:
+        """Retrieve all transactions from YNAB."""
+        url = f"{self.base_url}/budgets/{self.budget_id}/transactions"
+        
+        try:
+            response = requests.get(url, headers=self.headers)
+            response.raise_for_status()
+            transactions_data = response.json()["data"]["transactions"]
+            
+            return [
+                Transaction(
+                    id=t["id"],
+                    payee_id=t.get("payee_id")  # payee_id can be None
+                )
+                for t in transactions_data
+            ]
+        except requests.exceptions.RequestException as e:
+            raise RuntimeError(f"Error fetching transactions from YNAB: {e}") from e
+
+    def delete_payee(self, payee_id: str) -> bool:
+        """Delete a payee from YNAB."""
+        url = f"{self.base_url}/budgets/{self.budget_id}/payees/{payee_id}"
+        
+        try:
+            response = requests.delete(url, headers=self.headers)
+            response.raise_for_status()
+            return True
+        except requests.exceptions.RequestException as e:
+            print(f"Error deleting payee in YNAB: {e}")
             return False
     
     # Additional methods can be added here as needed for other YNAB API endpoints
