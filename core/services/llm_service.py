@@ -59,16 +59,33 @@ class GroqService(LLMService):
             
     def get_emoji_suggestion(self, text: str) -> Optional[str]:
         """Get emoji suggestion for text using Groq API."""
+        # Check if this is a retry attempt (contains previously suggested emojis)
+        retry_instructions = ""
+        if "Previously suggested:" in text:
+            # Split the input to separate the payee name from the retry context
+            parts = text.split("This is retry #")
+            base_text = parts[0].strip()
+            
+            # Extract previously suggested emojis
+            if len(parts) > 1:
+                previously_suggested = parts[1].split("Previously suggested:")[1].strip()
+                retry_instructions = (
+                    f"\nThis is a retry attempt. Please suggest a DIFFERENT emoji than the "
+                    f"following previously suggested ones: {previously_suggested}."
+                )
+        else:
+            base_text = text
+            
         prompt = (
             f'Please suggest a single emoji that best represents the following '
-            f'business/payee name: "{text}"\n\n'
+            f'business/payee name: "{base_text}"{retry_instructions}\n\n'
             f'Return ONLY the emoji character and nothing else. Choose an emoji '
             f'that intuitively represents the type of business or service.'
         )
         
         return self.generate_text(
             prompt=prompt,
-            temperature=0.5,
+            temperature=0.7,  # Slightly higher temperature for more variety in retries
             max_tokens=10
         )
 

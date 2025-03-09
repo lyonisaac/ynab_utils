@@ -8,9 +8,10 @@ YNAB Emoji Namer is a Python utility that automatically adds emojis to your YNAB
 
 - Identifies payees without emojis
 - Uses AI to suggest appropriate emojis
-- Interactive approval process
+- Interactive approval process with retry option
 - Ignore specific payees
 - Persists ignored payee list
+- Avoids duplicate emoji suggestions during retries
 
 ## Prerequisites
 
@@ -47,8 +48,14 @@ python -m ynab_namer
 ### Workflow
 - Scans your YNAB payees
 - Suggests emojis for payees without them
-- Interactively approve or reject suggestions
+- Interactively approve, reject, retry, or ignore suggestions
 - Option to ignore specific payees
+
+### Interactive Options
+- `y` - Accept the suggested emoji and update payee name
+- `n` - Reject the suggestion and proceed to next payee
+- `i` - Ignore this payee in future runs
+- `r` - Retry with an alternative emoji suggestion
 
 ## Customization
 
