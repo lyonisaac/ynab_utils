@@ -1,3 +1,0 @@
--e ..
-
-# Install project specific requirements here if needed
