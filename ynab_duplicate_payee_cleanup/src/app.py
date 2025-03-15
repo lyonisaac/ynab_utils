@@ -117,10 +117,7 @@ class DuplicatePayeeCleanup:
                     )
                 
                 # Delete the duplicate payee (set deleted flag)
-                self.ynab_service.update_payee(
-                    payee_id=payee.id,
-                    deleted=True
-                )
+                self.ynab_service.set_payee_deleted(payee.id, True)
             
             count += 1
             print(f"Payee: {payee.name} → {target_payee.name} ({len(transactions)} transactions)")
