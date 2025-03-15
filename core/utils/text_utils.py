@@ -25,8 +25,13 @@ def has_emoji(text: str) -> bool:
         "\U0001F900-\U0001F9FF"  # Supplemental Symbols and Pictographs
         "\U0001FA00-\U0001FA6F"  # Chess Symbols
         "\U0001FA70-\U0001FAFF"  # Symbols and Pictographs Extended-A
-        "\U00002702-\U000027B0"  # Dingbats
-        "\U000024C2-\U0001F251" 
+        "\U00002300-\U000023FF"  # Miscellaneous Technical
+        "\U00002600-\U000026FF"  # Miscellaneous Symbols
+        "\U00002700-\U000027BF"  # Dingbats
+        "\U0000FE00-\U0000FE0F"  # Variation Selectors
+        "\U000024C2-\U0001F251"
+        "\u200d"  # Zero width joiner
+        "\u20D0-\u20FF"  # Combining Diacritical Marks for Symbols
         "]+"
     )
     return bool(emoji_pattern.search(text))
@@ -54,8 +59,13 @@ def extract_emojis(text: str) -> List[str]:
         "\U0001F900-\U0001F9FF"  # Supplemental Symbols and Pictographs
         "\U0001FA00-\U0001FA6F"  # Chess Symbols
         "\U0001FA70-\U0001FAFF"  # Symbols and Pictographs Extended-A
-        "\U00002702-\U000027B0"  # Dingbats
-        "\U000024C2-\U0001F251" 
+        "\U00002300-\U000023FF"  # Miscellaneous Technical
+        "\U00002600-\U000026FF"  # Miscellaneous Symbols
+        "\U00002700-\U000027BF"  # Dingbats
+        "\U0000FE00-\U0000FE0F"  # Variation Selectors
+        "\U000024C2-\U0001F251"
+        "\u200d"  # Zero width joiner
+        "\u20D0-\u20FF"  # Combining Diacritical Marks for Symbols
         "]+"
     )
     return emoji_pattern.findall(text)
