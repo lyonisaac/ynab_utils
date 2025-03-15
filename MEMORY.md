@@ -14,6 +14,7 @@ Copy.
 │       └── text_utils.py      # Text processing helpers
 ├── ynab_payee_cleanup/        # Payee cleanup tool
 ├── ynab_namer/                # Emoji naming tool
+├── ynab_duplicate_payee_cleanup/  # Duplicate payee cleanup tool
 ├── setup.py                   # Core package setup
 └── requirements.txt           # Project dependencies
 ```
@@ -22,7 +23,7 @@ Copy.
 
 ### YNAB Payee Cleanup (v1.0.0)
 
-Identifies and marks unused payees as deleted
+Identifies and properly deletes unused payees by setting the deleted flag to true
 
 **Features:**
 - Dry-run mode for previewing changes
@@ -37,6 +38,16 @@ Adds emojis to payee names using AI suggestions
 - AI-powered emoji suggestions via Groq API
 - Interactive approval process
 - Persistent ignored payees list
+
+### YNAB Duplicate Payee Cleanup (v1.0.0)
+
+Identifies and merges duplicate payees based on normalized names (removing whitespace and emojis)
+
+**Features:**
+- Identifies duplicate payees by comparing normalized names
+- Prioritizes keeping payees that already have emojis
+- Reassigns transactions from duplicates to a target payee
+- Supports dry-run mode for safe testing
 
 ## Core Components
 
@@ -56,6 +67,8 @@ Adds emojis to payee names using AI suggestions
 - Implemented base functionality for both tools
 - Established shared core library for code reuse
 - Added LLM integration with Groq for emoji suggestions
+- Improved YNAB Payee Cleanup to properly delete unused payees
+- Added YNAB Duplicate Payee Cleanup to consolidate duplicate payees
 
 ## Current Challenges
 
