@@ -29,6 +29,13 @@ class EmojiNamer:
     def get_payees_needing_emoji(self) -> List[Payee]:
         """Get list of payees that need emoji assignment."""
         all_payees = self.ynab_service.get_payees()
+        
+        # Debug which payees with potential emojis are being included
+        for p in all_payees:
+            if not self.ignored_payees.is_ignored(p.id) and not p.deleted and p.name.strip():
+                if "⏳" in p.name or "⌛" in p.name or "⏱" in p.name or "⏰" in p.name:
+                    print(f"Payee with time symbol not detected as emoji: {p.name}")
+        
         return [
             p for p in all_payees 
             if not has_emoji(p.name)
