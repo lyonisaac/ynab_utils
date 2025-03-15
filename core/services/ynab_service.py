@@ -122,6 +122,48 @@ class YNABService:
             ]
         except requests.exceptions.RequestException as e:
             raise RuntimeError(f"Error fetching transactions from YNAB: {e}") from e
+            
+    def get_transactions_by_payee_id(self, payee_id: str) -> List[Transaction]:
+        """
+        Retrieve all transactions associated with a specific payee.
+        
+        Args:
+            payee_id: ID of the payee to get transactions for
+            
+        Returns:
+            List[Transaction]: List of transaction objects for the payee
+        """
+        # Get all transactions
+        all_transactions = self.get_transactions()
+        
+        # Filter for the specific payee
+        return [t for t in all_transactions if t.payee_id == payee_id]
+    
+    def update_transaction(self, transaction_id: str, payee_id: str) -> bool:
+        """
+        Update a transaction's payee ID.
+        
+        Args:
+            transaction_id: ID of the transaction to update
+            payee_id: New payee ID to assign
+            
+        Returns:
+            bool: True if updated successfully, False otherwise
+        """
+        url = f"{self.base_url}/budgets/{self.budget_id}/transactions/{transaction_id}"
+        data = {
+            "transaction": {
+                "payee_id": payee_id
+            }
+        }
+        
+        try:
+            response = requests.put(url, headers=self.headers, json=data)
+            response.raise_for_status()
+            return True
+        except requests.exceptions.RequestException as e:
+            print(f"Error updating transaction in YNAB: {e}")
+            return False
 
     def mark_payee_as_deleted(self, payee_id: str) -> bool:
         """
