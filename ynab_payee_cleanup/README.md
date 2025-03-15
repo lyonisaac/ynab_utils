@@ -2,11 +2,13 @@
 
 ## Overview
 
-YNAB Payee Cleanup is a Python utility that helps you clean up unused payees in your You Need A Budget (YNAB) budget. It identifies and marks payees with no associated transactions as deleted, helping to keep your YNAB budget clean and organized.
+YNAB Payee Cleanup is a Python utility that helps you clean up unused payees in your You Need A Budget (YNAB) budget. It identifies payees with no associated transactions and properly deletes them from your budget, helping to keep your YNAB budget clean and organized.
 
 ## Features
 
 - Identifies unused payees across your budget
+- Properly deletes unused payees (sets deleted flag to true)
+- Makes payees disappear from the YNAB UI
 - Supports dry-run mode to preview potential deletions
 - Interactive mode for manual review of each payee
 - Skips system payees like transfers
@@ -60,7 +62,7 @@ python -m ynab_payee_cleanup --interactive
 1. Retrieves all payees from your YNAB budget
 2. Fetches all transactions
 3. Identifies payees with no associated transactions
-4. Marks identified payees as deleted
+4. Sets the `deleted` flag to `true` for these payees
 5. Provides a summary of the cleanup process
 
 ## Contributing

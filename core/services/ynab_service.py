@@ -67,6 +67,43 @@ class YNABService:
             print(f"Error updating payee in YNAB: {e}")
             return False
     
+    def update_payee(self, payee_id: str, data: Dict[str, Any]) -> bool:
+        """
+        Update a payee's properties in YNAB.
+        
+        Args:
+            payee_id: ID of the payee to update
+            data: Dictionary of properties to update
+            
+        Returns:
+            bool: True if updated successfully, False otherwise
+        """
+        url = f"{self.base_url}/budgets/{self.budget_id}/payees/{payee_id}"
+        payload = {
+            "payee": data
+        }
+        
+        try:
+            response = requests.put(url, headers=self.headers, json=payload)
+            response.raise_for_status()
+            return True
+        except requests.exceptions.RequestException as e:
+            print(f"Error updating payee in YNAB: {e}")
+            return False
+    
+    def set_payee_deleted(self, payee_id: str, deleted: bool = True) -> bool:
+        """
+        Mark a payee as deleted by setting the deleted flag.
+        
+        Args:
+            payee_id: ID of the payee to mark as deleted
+            deleted: True to mark as deleted, False to undelete
+            
+        Returns:
+            bool: True if marked as deleted successfully, False otherwise
+        """
+        return self.update_payee(payee_id, {"deleted": deleted})
+    
     def get_transactions(self) -> List[Transaction]:
         """Retrieve all transactions from YNAB."""
         url = f"{self.base_url}/budgets/{self.budget_id}/transactions"
@@ -87,7 +124,12 @@ class YNABService:
             raise RuntimeError(f"Error fetching transactions from YNAB: {e}") from e
 
     def mark_payee_as_deleted(self, payee_id: str) -> bool:
-        """Mark a payee as deleted by renaming it."""
+        """
+        Mark a payee as deleted.
+        
+        Legacy method that renames the payee to "Deleted".
+        Consider using set_payee_deleted() instead for proper deletion.
+        """
         return self.update_payee_name(payee_id, self.DELETED_PAYEE_NAME)
     
     # Additional methods can be added here as needed for other YNAB API endpoints

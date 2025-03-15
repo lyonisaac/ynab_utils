@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 YNAB Payee Cleanup - Main entry point
-Marks unused payees as deleted by renaming them to a common name
+Sets unused payees' deleted status to true so they disappear from the UI
 """
 import os
 import sys
@@ -42,21 +42,20 @@ class PayeeCleanup:
         used_payee_ids = {t.payee_id for t in transactions if t.payee_id}
         
         # Filter payees that aren't in the used set and aren't deleted
-        # Also exclude payees that start with "Transfer" or are already named "Deleted"
+        # Also exclude payees that start with "Transfer"
         unused_payees = [
             p for p in all_payees 
             if p.id not in used_payee_ids 
             and not p.deleted 
             and p.name.strip()
             and not p.name.strip().startswith("Transfer")
-            and p.name != self.ynab_service.DELETED_PAYEE_NAME
         ]
         
         return unused_payees
     
     def delete_payee(self, payee: Payee, dry_run: bool = False) -> bool:
         """
-        Mark a payee as deleted by renaming it.
+        Mark a payee as deleted by setting its deleted flag to true.
         
         Args:
             payee: Payee object to mark as deleted
@@ -69,7 +68,7 @@ class PayeeCleanup:
             print(f"Would mark as deleted: {payee.name}")
             return True
             
-        success = self.ynab_service.mark_payee_as_deleted(payee.id)
+        success = self.ynab_service.set_payee_deleted(payee.id, True)
         if success:
             print(f"✅ Marked as deleted: {payee.name}")
         else:
