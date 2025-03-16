@@ -15,18 +15,20 @@ class DuplicatePayeeCleanup:
     without whitespace and emojis
     """
     
-    def __init__(self, config: BaseConfig, dry_run: bool = True):
+    def __init__(self, config: BaseConfig, dry_run: bool = True, interactive: bool = False):
         """Initialize the duplicate payee cleanup tool.
         
         Args:
             config: Configuration object
             dry_run: If True, don't make any actual changes to YNAB
+            interactive: If True, prompt for confirmation before each merge
         """
         self.ynab_service = YNABService(
             api_key=config.ynab_api_key,
             budget_id=config.ynab_budget_id
         )
         self.dry_run = dry_run
+        self.interactive = interactive
         
     def _normalize_payee_name(self, name: str) -> str:
         """Normalize a payee name by removing whitespace and emojis.
@@ -87,6 +89,37 @@ class DuplicatePayeeCleanup:
         # If no payee has an emoji, use the first one
         return duplicates[0]
     
+    def _prompt_for_confirmation(self, norm_name: str, duplicates: List[Payee], target_payee: Payee) -> bool:
+        """Ask the user for confirmation before merging duplicate payees.
+        
+        Args:
+            norm_name: The normalized name of the payee group
+            duplicates: List of all duplicate payees
+            target_payee: The selected target payee
+            
+        Returns:
+            bool: True if the user confirms the merge, False otherwise
+        """
+        print(f"\nGroup '{norm_name}' ({len(duplicates)} payees):")
+        
+        # Display all duplicates in the group
+        for idx, payee in enumerate(duplicates, 1):
+            print(f"  {idx}. {payee.name}")
+        
+        print(f"  → Automatically selected to keep: {target_payee.name}")
+        
+        while True:
+            choice = input("Merge these payees? [y/n/q]: ").strip().lower()
+            if choice in ('y', 'n', 'q'):
+                break
+            print("Invalid choice. Please enter y (yes), n (no), or q (quit).")
+        
+        if choice == 'q':
+            print("Exiting...")
+            exit(0)
+            
+        return choice == 'y'
+    
     def _merge_payees(self, target_payee: Payee, duplicates: List[Payee]) -> int:
         """Merge duplicate payees by reassigning transactions and deleting duplicates.
         
@@ -126,7 +159,11 @@ class DuplicatePayeeCleanup:
     
     def run(self) -> None:
         """Run the duplicate payee cleanup process."""
-        print(f"YNAB Duplicate Payee Cleanup {'(DRY RUN)' if self.dry_run else ''}")
+        mode_str = "(DRY RUN)" if self.dry_run else ""
+        if self.interactive:
+            mode_str += " (INTERACTIVE)" if mode_str else "(INTERACTIVE)"
+            
+        print(f"YNAB Duplicate Payee Cleanup {mode_str}")
         print("=" * 60)
         
         # Find duplicate payees
@@ -136,30 +173,42 @@ class DuplicatePayeeCleanup:
             print("No duplicate payees found!")
             return
         
-        print(f"Found {len(duplicate_groups)} groups of duplicate payees:")
-        print()
+        print(f"Found {len(duplicate_groups)} groups of duplicate payees")
         
         total_merged = 0
+        skipped = 0
         
         # Process each group of duplicates
         for norm_name, duplicates in duplicate_groups.items():
-            print(f"Group '{norm_name}' ({len(duplicates)} payees):")
-            
-            # Display all duplicates in the group
-            for idx, payee in enumerate(duplicates, 1):
-                print(f"  {idx}. {payee.name}")
+            if not self.interactive:
+                print(f"\nGroup '{norm_name}' ({len(duplicates)} payees):")
+                
+                # Display all duplicates in the group
+                for idx, payee in enumerate(duplicates, 1):
+                    print(f"  {idx}. {payee.name}")
             
             # Select which payee to keep
             target_payee = self._select_target_payee(duplicates)
-            print(f"  → Keeping: {target_payee.name}")
+            
+            # In interactive mode, prompt for confirmation
+            if self.interactive:
+                if not self._prompt_for_confirmation(norm_name, duplicates, target_payee):
+                    print("Skipping this group.")
+                    skipped += 1
+                    continue
+            else:
+                print(f"  → Keeping: {target_payee.name}")
             
             # Merge the payees
             merged_count = self._merge_payees(target_payee, duplicates)
             total_merged += merged_count
-            print()
         
+        print("\n" + "=" * 60)
         print(f"Complete! {total_merged} payees {'would be' if self.dry_run else 'were'} merged.")
+        
+        if skipped > 0:
+            print(f"You chose to skip {skipped} groups of duplicate payees.")
         
         if self.dry_run:
             print("\nThis was a dry run. No changes were made to your YNAB budget.")
-            print("To perform actual changes, set YNAB_DUPLICATE_CLEANUP_DRY_RUN=false in your .env file.")
+            print("To perform actual changes, run again without --dry-run or set YNAB_DUPLICATE_CLEANUP_DRY_RUN=false in your .env file.")

@@ -11,6 +11,7 @@ This tool identifies and merges duplicate payees in your YNAB budget by comparin
 - Merges all transactions from duplicate payees to the selected target payee
 - Marks merged payees as deleted in YNAB
 - Supports dry-run mode for previewing changes without modifying your budget
+- Interactive mode that lets you approve each group of duplicates before merging
 
 ## Usage
 
@@ -18,17 +19,38 @@ This tool identifies and merges duplicate payees in your YNAB budget by comparin
 ```
 YNAB_API_KEY=your_ynab_api_key
 YNAB_BUDGET_ID=your_budget_id
-YNAB_DUPLICATE_CLEANUP_DRY_RUN=true
 ```
 
 2. Run the tool:
 ```
-python -m ynab_duplicate_payee_cleanup.main
+python -m ynab_duplicate_payee_cleanup
 ```
 
-3. Review the identified duplicates and proposed changes
+### Command-line Options
 
-4. To perform actual changes, set `YNAB_DUPLICATE_CLEANUP_DRY_RUN=false` in your `.env` file and run again
+- `--dry-run`: Simulate merging without actually modifying data (default behavior)
+- `--interactive`: Prompt for confirmation before merging each group of duplicates
+
+### Examples
+
+```bash
+# Preview all potential changes without modifying anything
+python -m ynab_duplicate_payee_cleanup --dry-run
+
+# Interactively review and approve each group of duplicates before merging
+python -m ynab_duplicate_payee_cleanup --interactive
+
+# Interactively review in dry-run mode (no changes will be made)
+python -m ynab_duplicate_payee_cleanup --dry-run --interactive
+
+# Perform actual merges without prompting
+python -m ynab_duplicate_payee_cleanup
+```
+
+You can also control the dry-run behavior through the `.env` file:
+```
+YNAB_DUPLICATE_CLEANUP_DRY_RUN=false
+```
 
 ## How It Works
 
@@ -54,6 +76,16 @@ The tool will:
 2. Select "🏠 Walmart" as the target payee (because it has an emoji)
 3. Move all transactions from "Walmart " and "walmart" to "🏠 Walmart"
 4. Mark "Walmart " and "walmart" as deleted
+
+## Interactive Mode
+
+In interactive mode, for each group of duplicates you'll be prompted with:
+- List of all payees in the duplicate group
+- The automatically selected target payee (which will be kept)
+- Options to:
+  - Accept (y): Merge the duplicates
+  - Reject (n): Skip this group and continue to the next
+  - Quit (q): Exit the program
 
 ## Disclaimer
 
