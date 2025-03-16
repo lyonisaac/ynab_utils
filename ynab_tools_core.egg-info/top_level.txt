@@ -1,4 +1,0 @@
-core
-ynab_duplicate_payee_cleanup
-ynab_namer
-ynab_payee_cleanup
