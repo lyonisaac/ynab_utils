@@ -1,0 +1,42 @@
+[
+  {
+    "id": "ea9c9599-00c4-41c9-a3d9-63c3830e1b0b",
+    "name": "Starting Balance",
+    "ignored_at": "2025-03-15T20:51:42.711691"
+  },
+  {
+    "id": "80865527-8f5e-4941-85e8-7e8da539e08a",
+    "name": "Manual Balance Adjustment",
+    "ignored_at": "2025-03-15T20:51:43.903877"
+  },
+  {
+    "id": "c0412c28-9059-4964-bb39-0bc162ac73f9",
+    "name": "Reconciliation Balance Adjustment",
+    "ignored_at": "2025-03-15T20:51:45.006419"
+  },
+  {
+    "id": "2c1fc2e3-cca2-4f0f-83d9-88c012a7d22e",
+    "name": "Deleted",
+    "ignored_at": "2025-03-15T20:51:46.244100"
+  },
+  {
+    "id": "36ebe85a-682b-4487-ae0e-e791b918d04b",
+    "name": "Sequence Compound t Sequence transfer",
+    "ignored_at": "2025-03-15T20:51:48.674180"
+  },
+  {
+    "id": "18e3c955-79cd-4897-ab4c-89f470a0b477",
+    "name": "Returned Payment",
+    "ignored_at": "2025-03-15T20:51:51.712254"
+  },
+  {
+    "id": "560b7869-7484-4737-88fe-0382bf9c11a3",
+    "name": "AplPay HEALTHY PET 6AUSTIN",
+    "ignored_at": "2025-03-15T20:51:53.512253"
+  },
+  {
+    "id": "f9dea7be-6295-4de2-ad83-ee8756828f20",
+    "name": "AUSTIN CREATIVE REUS512-3753041",
+    "ignored_at": "2025-03-15T20:51:54.703774"
+  }
+]
